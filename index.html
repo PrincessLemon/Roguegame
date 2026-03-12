@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RogueHack</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <pre id="asciiTitle" class="ascii-title">
+██████╗  ██████╗  ██████╗ ██╗   ██╗███████╗██╗  ██╗ █████╗  ██████╗██╗  ██╗
+██╔══██╗██╔═══██╗██╔════╝ ██║   ██║██╔════╝██║  ██║██╔══██╗██╔════╝██║ ██╔╝
+██████╔╝██║   ██║██║  ███╗██║   ██║█████╗  ███████║███████║██║     █████╔╝
+██╔══██╗██║   ██║██║   ██║██║   ██║██╔══╝  ██╔══██║██╔══██║██║     ██╔═██╗
+██║  ██║╚██████╔╝╚██████╔╝╚██████╔╝███████╗██║  ██║██║  ██║╚██████╗██║  ██╗
+╚═╝  ╚═╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+  </pre>
+
+    <p class="help">
+        Arrow keys = move • Walk into enemies to attack • I = inventory • 1-9 = use/equip item • R = restart after death
+    </p>
+
+    <div id="hud">
+        <div id="stats">HP: 10/10 | ATK: 1 | Gold: 0 | Floor: 1 | LVL: 1 | XP: 0/3</div>
+        <div id="equipment">Weapon: None | Armor: None</div>
+        <div id="message">Welcome to RogueHack.</div>
+    </div>
+
+    <div id="levelUpPanel" class="panel hidden">
+        <h2>LEVEL UP!</h2>
+        <p>Choose your upgrade:</p>
+        <p><strong>1</strong> = +1 Base Attack</p>
+        <p><strong>2</strong> = +3 Base Max HP and heal 3 HP</p>
+    </div>
+
+    <div id="inventoryPanel" class="panel hidden">
+        <h2>INVENTORY</h2>
+        <div id="inventoryList">Your inventory is empty.</div>
+        <p class="inventory-help">Press 1-9 to use/equip an item • Press I to close</p>
+    </div>
+
+    <div id="game"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

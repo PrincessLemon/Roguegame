@@ -1,0 +1,153 @@
+﻿body {
+    margin: 0;
+    padding: 20px;
+    background: #0d0d0d;
+    color: #e8e8e8;
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ascii-title {
+    margin: 0 0 12px 0;
+    color: #ff3b3b;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.05;
+    text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 15px #990000;
+    animation: flicker 1s infinite alternate;
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 1;
+        text-shadow: 0 0 4px #ff0000, 0 0 8px #ff0000, 0 0 12px #880000;
+    }
+
+    20% {
+        opacity: 0.85;
+    }
+
+    40% {
+        opacity: 1;
+        text-shadow: 0 0 6px #ff2222, 0 0 12px #ff0000, 0 0 16px #990000;
+    }
+
+    60% {
+        opacity: 0.78;
+    }
+
+    80% {
+        opacity: 0.96;
+    }
+
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 7px #ff4444, 0 0 14px #ff0000, 0 0 18px #aa0000;
+    }
+}
+
+.help {
+    margin: 0 0 16px 0;
+    text-align: center;
+}
+
+#hud {
+    width: 430px;
+    margin-bottom: 16px;
+    padding: 10px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    box-sizing: border-box;
+}
+
+#stats {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+#equipment {
+    margin-bottom: 6px;
+    color: #cfcfcf;
+}
+
+#message {
+    min-height: 20px;
+}
+
+.panel {
+    width: 430px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #181818;
+    border: 1px solid #444;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+    .panel h2 {
+        margin-top: 0;
+    }
+
+#levelUpPanel {
+    background: #220d0d;
+    border: 1px solid #8b1e1e;
+}
+
+    #levelUpPanel h2 {
+        color: #ff5a5a;
+    }
+
+#inventoryPanel {
+    text-align: left;
+}
+
+    #inventoryPanel h2 {
+        text-align: center;
+    }
+
+.inventory-help {
+    margin-bottom: 0;
+    text-align: center;
+    color: #bbb;
+}
+
+.inventory-item {
+    padding: 4px 0;
+    border-bottom: 1px solid #2c2c2c;
+}
+
+    .inventory-item:last-child {
+        border-bottom: none;
+    }
+
+.hidden {
+    display: none;
+}
+
+#game {
+    display: grid;
+    grid-template-columns: repeat(12, 32px);
+    grid-template-rows: repeat(12, 32px);
+    gap: 2px;
+}
+
+.tile {
+    width: 32px;
+    height: 32px;
+    box-sizing: border-box;
+    border: 1px solid #2c2c2c;
+    background: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+    .tile img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        image-rendering: pixelated;
+    }
