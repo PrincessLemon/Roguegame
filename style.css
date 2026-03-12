@@ -122,6 +122,51 @@
         border-bottom: none;
     }
 
+.death-panel {
+    width: 430px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #140808;
+    border: 1px solid #a11f1f;
+    text-align: center;
+}
+
+.death-title {
+    margin: 0 0 12px 0;
+    color: #ff3b3b;
+    font-size: 10px;
+    line-height: 1.05;
+    text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 18px #770000;
+    animation: deathFlicker 0.9s infinite alternate;
+}
+
+.death-subtitle {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    color: #ffd6d6;
+}
+
+.death-restart {
+    margin: 0;
+    color: #ffb3b3;
+}
+
+@keyframes deathFlicker {
+    0% {
+        opacity: 1;
+        text-shadow: 0 0 4px #ff0000, 0 0 8px #ff0000, 0 0 14px #770000;
+    }
+
+    50% {
+        opacity: 0.82;
+    }
+
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 7px #ff4d4d, 0 0 14px #ff0000, 0 0 20px #990000;
+    }
+}
+
 .hidden {
     display: none;
 }
@@ -132,6 +177,11 @@
     grid-template-rows: repeat(12, 32px);
     gap: 2px;
 }
+
+    #game.dead {
+        opacity: 0.45;
+        filter: grayscale(0.6);
+    }
 
 .tile {
     width: 32px;
