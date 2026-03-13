@@ -17,10 +17,11 @@
   </pre>
 
     <p class="help">
-        Arrow keys = move • Walk into enemies to attack • I = inventory • 1-9 = use/equip item • R = restart after death
+        Arrow keys = move • Walk into enemies to attack • I = inventory • 1-9 = use/equip item • R = restart after death/win
     </p>
 
     <div id="hud">
+        <div id="goal">Goal: Reach Floor 5 and defeat the boss.</div>
         <div id="stats">HP: 10/10 | ATK: 1 | Gold: 0 | Floor: 1 | LVL: 1 | XP: 0/3</div>
         <div id="equipment">Weapon: None | Armor: None</div>
         <div id="message">Welcome to RogueHack.</div>
@@ -50,6 +51,19 @@
     </pre>
         <p class="death-subtitle">You died :(</p>
         <p class="death-restart">Press <strong>R</strong> to restart</p>
+    </div>
+
+    <div id="winPanel" class="panel hidden win-panel">
+        <pre class="win-title">
+██╗   ██╗ ██████╗ ██╗   ██╗    ██╗    ██╗██╗███╗   ██╗
+╚██╗ ██╔╝██╔═══██╗██║   ██║    ██║    ██║██║████╗  ██║
+ ╚████╔╝ ██║   ██║██║   ██║    ██║ █╗ ██║██║██╔██╗ ██║
+  ╚██╔╝  ██║   ██║██║   ██║    ██║███╗██║██║██║╚██╗██║
+   ██║   ╚██████╔╝╚██████╔╝    ╚███╔███╔╝██║██║ ╚████║
+   ╚═╝    ╚═════╝  ╚═════╝      ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝
+    </pre>
+        <p class="win-subtitle">You defeated the boss!</p>
+        <p class="win-restart">Press <strong>R</strong> to play again</p>
     </div>
 
     <div id="game"></div>

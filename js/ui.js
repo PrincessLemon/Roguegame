@@ -2,6 +2,16 @@ function setMessage(text) {
     messageEl.textContent = text;
 }
 
+function updateGoal() {
+    if (floorLevel < BOSS_FLOOR) {
+        goalEl.textContent = `Goal: Reach Floor ${BOSS_FLOOR} and defeat the boss.`;
+    } else if (!gameWon) {
+        goalEl.textContent = `Goal: Defeat the boss!`;
+    } else {
+        goalEl.textContent = `Goal complete: You won!`;
+    }
+}
+
 function showLevelUpPanel() {
     levelUpPanel.classList.remove("hidden");
 }
@@ -26,8 +36,16 @@ function hideDeathPanel() {
     deathPanel.classList.add("hidden");
 }
 
+function showWinPanel() {
+    winPanel.classList.remove("hidden");
+}
+
+function hideWinPanel() {
+    winPanel.classList.add("hidden");
+}
+
 function toggleInventory() {
-    if (gameOver || awaitingLevelChoice) return;
+    if (gameOver || gameWon || awaitingLevelChoice) return;
 
     inventoryOpen = !inventoryOpen;
 
@@ -88,6 +106,12 @@ function getImageForItem(item) {
     return tileImages[item.icon] || tileImages.gold;
 }
 
+function getImageForEnemy(enemy) {
+    if (enemy.type === "rat") return tileImages.rat;
+    if (enemy.type === "boss") return tileImages.boss;
+    return tileImages.goblin;
+}
+
 function createTile(imagePath) {
     const tile = document.createElement("div");
     tile.classList.add("tile");
@@ -121,13 +145,13 @@ function draw() {
                 }
             }
 
-            if (stairs.x === x && stairs.y === y) {
-                imagePath = tileImages.stairs;
+            if (stairs && stairs.x === x && stairs.y === y) {
+                imagePath = floorLevel === BOSS_FLOOR - 1 ? tileImages.bossStairs : tileImages.stairs;
             }
 
             for (const enemy of enemies) {
                 if (enemy.alive && enemy.x === x && enemy.y === y) {
-                    imagePath = tileImages.goblin;
+                    imagePath = getImageForEnemy(enemy);
                 }
             }
 
@@ -139,6 +163,7 @@ function draw() {
         }
     }
 
+    updateGoal();
     updateStats();
 
     if (inventoryOpen) {

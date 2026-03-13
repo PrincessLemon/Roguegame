@@ -5,18 +5,17 @@ function generateLevel() {
     player.x = 2;
     player.y = 2;
 
+    if (floorLevel === BOSS_FLOOR) {
+        generateBossFloor();
+        return;
+    }
+
     const enemyCount = 2 + floorLevel;
     const lootCount = 3;
 
     for (let i = 0; i < enemyCount; i++) {
         const pos = getRandomEmptyPosition();
-        enemies.push({
-            x: pos.x,
-            y: pos.y,
-            hp: 1 + floorLevel,
-            alive: true,
-            xpReward: 1 + Math.floor(floorLevel / 2)
-        });
+        enemies.push(generateRandomEnemy(pos.x, pos.y));
     }
 
     for (let i = 0; i < lootCount; i++) {
@@ -33,6 +32,60 @@ function generateLevel() {
     stairs = {
         x: stairPos.x,
         y: stairPos.y
+    };
+}
+
+function generateBossFloor() {
+    lootItems = [];
+
+    const bossPos = { x: 8, y: 5 };
+    enemies.push({
+        x: bossPos.x,
+        y: bossPos.y,
+        name: "Dungeon Lord",
+        type: "boss",
+        hp: 12,
+        maxHp: 12,
+        damage: 2,
+        alive: true,
+        xpReward: 8,
+        goldReward: 20,
+        icon: "boss"
+    });
+
+    // no stairs on boss floor; kill boss to win
+    stairs = null;
+}
+
+function generateRandomEnemy(x, y) {
+    const roll = Math.random();
+
+    if (roll < 0.35) {
+        return {
+            x,
+            y,
+            name: "Rat",
+            type: "rat",
+            hp: 1 + Math.max(0, floorLevel - 1),
+            damage: 1,
+            alive: true,
+            xpReward: 1,
+            goldReward: 1,
+            icon: "rat"
+        };
+    }
+
+    return {
+        x,
+        y,
+        name: "Goblin",
+        type: "goblin",
+        hp: 1 + floorLevel,
+        damage: 1,
+        alive: true,
+        xpReward: 1 + Math.floor(floorLevel / 2),
+        goldReward: 3,
+        icon: "goblin"
     };
 }
 
@@ -151,7 +204,7 @@ function syncPlayerStats() {
 }
 
 function tryMove(dx, dy) {
-    if (gameOver || awaitingLevelChoice || inventoryOpen) return;
+    if (gameOver || gameWon || awaitingLevelChoice || inventoryOpen) return;
 
     const newX = player.x + dx;
     const newY = player.y + dy;
@@ -166,7 +219,7 @@ function tryMove(dx, dy) {
     if (enemy) {
         attackEnemy(enemy);
 
-        if (!gameOver && !awaitingLevelChoice) {
+        if (!gameOver && !gameWon && !awaitingLevelChoice) {
             enemiesTurn();
         }
 
@@ -179,14 +232,21 @@ function tryMove(dx, dy) {
 
     pickUpLoot();
 
-    if (gameOver || awaitingLevelChoice) {
+    if (gameOver || gameWon || awaitingLevelChoice) {
         draw();
         return;
     }
 
-    if (player.x === stairs.x && player.y === stairs.y) {
+    if (stairs && player.x === stairs.x && player.y === stairs.y) {
         floorLevel++;
-        setMessage("You descend deeper into RogueHack.");
+        updateGoal();
+
+        if (floorLevel === BOSS_FLOOR) {
+            setMessage("You enter the boss floor...");
+        } else {
+            setMessage("You descend deeper into RogueHack.");
+        }
+
         generateLevel();
         draw();
         return;
@@ -201,14 +261,21 @@ function attackEnemy(enemy) {
 
     if (enemy.hp <= 0) {
         enemy.alive = false;
-        player.gold += 3;
-        gainXp(enemy.xpReward);
+        player.gold += enemy.goldReward || 0;
+        gainXp(enemy.xpReward || 0);
 
-        if (!awaitingLevelChoice) {
-            setMessage("You defeated a goblin and found 3 gold.");
+        if (enemy.type === "boss") {
+            winGame();
+            return;
         }
+
+        setMessage(`You defeated the ${enemy.name.toLowerCase()} and found ${enemy.goldReward || 0} gold.`);
     } else {
-        setMessage(`You hit a goblin. Goblin HP: ${enemy.hp}`);
+        if (enemy.type === "boss") {
+            setMessage(`You hit the boss. Boss HP: ${enemy.hp}`);
+        } else {
+            setMessage(`You hit the ${enemy.name.toLowerCase()}. ${enemy.name} HP: ${enemy.hp}`);
+        }
     }
 }
 
@@ -269,7 +336,7 @@ function pickUpLoot() {
 }
 
 function useInventorySlot(slotNumber) {
-    if (!inventoryOpen || awaitingLevelChoice || gameOver) return;
+    if (!inventoryOpen || awaitingLevelChoice || gameOver || gameWon) return;
 
     const index = slotNumber - 1;
     if (index < 0 || index >= player.inventory.length) return;
@@ -308,7 +375,7 @@ function useInventorySlot(slotNumber) {
 }
 
 function enemiesTurn() {
-    if (gameOver || awaitingLevelChoice || inventoryOpen) return;
+    if (gameOver || gameWon || awaitingLevelChoice || inventoryOpen) return;
 
     for (const enemy of enemies) {
         if (!enemy.alive) continue;
@@ -318,8 +385,8 @@ function enemiesTurn() {
         const distance = Math.abs(dx) + Math.abs(dy);
 
         if (distance === 1) {
-            enemyAttack();
-            if (gameOver || awaitingLevelChoice) return;
+            enemyAttack(enemy);
+            if (gameOver || gameWon || awaitingLevelChoice) return;
             continue;
         }
 
@@ -339,24 +406,24 @@ function enemiesTurn() {
         const blockedByEnemy = enemies.some(
             other => other !== enemy && other.alive && other.x === targetX && other.y === targetY
         );
-        const blockedByStairs = stairs.x === targetX && stairs.y === targetY;
         const blockedByPlayer = player.x === targetX && player.y === targetY;
 
-        if (!blockedByWall && !blockedByEnemy && !blockedByStairs && !blockedByPlayer) {
+        if (!blockedByWall && !blockedByEnemy && !blockedByPlayer) {
             enemy.x = targetX;
             enemy.y = targetY;
         }
 
         const newDistance = Math.abs(player.x - enemy.x) + Math.abs(player.y - enemy.y);
         if (newDistance === 1) {
-            enemyAttack();
-            if (gameOver || awaitingLevelChoice) return;
+            enemyAttack(enemy);
+            if (gameOver || gameWon || awaitingLevelChoice) return;
         }
     }
 }
 
-function enemyAttack() {
-    player.hp -= 1;
+function enemyAttack(enemy) {
+    const damage = enemy.damage || 1;
+    player.hp -= damage;
 
     if (player.hp <= 0) {
         player.hp = 0;
@@ -366,8 +433,27 @@ function enemyAttack() {
         hideLevelUpPanel();
         showDeathPanel();
         gameEl.classList.add("dead");
-        setMessage("You died. Press R to restart.");
+
+        if (enemy.type === "boss") {
+            setMessage(`The boss defeated you. Press R to restart.`);
+        } else {
+            setMessage(`The ${enemy.name.toLowerCase()} defeated you. Press R to restart.`);
+        }
     } else {
-        setMessage(`A goblin hits you. HP is now ${player.hp}.`);
+        if (enemy.type === "boss") {
+            setMessage(`The boss hits you for ${damage}. HP is now ${player.hp}.`);
+        } else {
+            setMessage(`The ${enemy.name.toLowerCase()} hits you for ${damage}. HP is now ${player.hp}.`);
+        }
     }
+}
+
+function winGame() {
+    gameWon = true;
+    inventoryOpen = false;
+    hideInventoryPanel();
+    hideLevelUpPanel();
+    showWinPanel();
+    gameEl.classList.add("won");
+    setMessage("You defeated the Dungeon Lord and won RogueHack!");
 }

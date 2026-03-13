@@ -6,9 +6,12 @@ const levelUpPanel = document.getElementById("levelUpPanel");
 const inventoryPanel = document.getElementById("inventoryPanel");
 const inventoryListEl = document.getElementById("inventoryList");
 const deathPanel = document.getElementById("deathPanel");
+const winPanel = document.getElementById("winPanel");
+const goalEl = document.getElementById("goal");
 
 const MAP_WIDTH = 12;
 const MAP_HEIGHT = 12;
+const BOSS_FLOOR = 5;
 
 const baseMap = [
     "############",
@@ -30,9 +33,12 @@ const tileImages = {
     wall: "assets/wall.png",
     player: "assets/player.png",
     goblin: "assets/goblin.png",
+    rat: "assets/rat.png",
+    boss: "assets/boss.png",
     potion: "assets/potion.png",
     gold: "assets/gold.png",
     stairs: "assets/stairs.png",
+    bossStairs: "assets/boss_stairs.png",
     dagger: "assets/dagger.png",
     sword: "assets/sword.png",
     armor: "assets/armor.png"
@@ -44,6 +50,7 @@ let lootItems;
 let stairs;
 let floorLevel;
 let gameOver;
+let gameWon;
 let awaitingLevelChoice;
 let inventoryOpen;
 
@@ -51,6 +58,7 @@ function resetGame() {
     floorLevel = 1;
     awaitingLevelChoice = false;
     inventoryOpen = false;
+    gameWon = false;
 
     player = {
         x: 2,
@@ -75,8 +83,11 @@ function resetGame() {
     hideLevelUpPanel();
     hideInventoryPanel();
     hideDeathPanel();
+    hideWinPanel();
     gameEl.classList.remove("dead");
+    gameEl.classList.remove("won");
     generateLevel();
+    updateGoal();
     setMessage("Welcome to RogueHack. You start with one potion.");
     draw();
 }
@@ -104,7 +115,7 @@ document.addEventListener("keydown", (e) => {
         return;
     }
 
-    if (e.key.toLowerCase() === "r" && gameOver) {
+    if (e.key.toLowerCase() === "r" && (gameOver || gameWon)) {
         resetGame();
     }
 });
